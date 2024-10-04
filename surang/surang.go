@@ -1,7 +1,6 @@
 package surang
 
 import (
-	"context"
 	"fmt"
 	"os/exec"
 	"strconv"
@@ -17,7 +16,7 @@ type Surang struct {
 }
 
 // IsRunning checks if the surang is currently running.
-func (s *Surang) IsRunning(ctx context.Context) bool {
+func (s *Surang) IsRunning() bool {
 	cmdPattern := fmt.Sprintf("ssh -f -N -D %d %s", s.Port, s.Command)
 	cmd := exec.Command("pgrep", "-f", cmdPattern)
 	output, err := cmd.Output()
@@ -25,7 +24,7 @@ func (s *Surang) IsRunning(ctx context.Context) bool {
 }
 
 // Start launches the surang.
-func (s *Surang) Start(ctx context.Context) error {
+func (s *Surang) Start() error {
 	cmd := exec.Command("ssh", "-f", "-N", "-D", strconv.Itoa(s.Port), s.Command)
 	if err := cmd.Start(); err != nil {
 		return fmt.Errorf("error starting surang %s: %w", s.Name, err)
@@ -34,15 +33,15 @@ func (s *Surang) Start(ctx context.Context) error {
 }
 
 // Restart restarts the surang.
-func (s *Surang) Restart(ctx context.Context) error {
-	if err := s.Stop(ctx); err != nil {
+func (s *Surang) Restart() error {
+	if err := s.Stop(); err != nil {
 		return err
 	}
-	return s.Start(ctx)
+	return s.Start()
 }
 
 // Stop terminates the surang.
-func (s *Surang) Stop(ctx context.Context) error {
+func (s *Surang) Stop() error {
 	cmdPattern := fmt.Sprintf("ssh -f -N -D %d %s", s.Port, s.Command)
 	cmd := exec.Command("pkill", "-f", cmdPattern)
 	if err := cmd.Run(); err != nil {
@@ -52,7 +51,7 @@ func (s *Surang) Stop(ctx context.Context) error {
 }
 
 // Check verifies if the surang is correctly forwarding traffic.
-func (s *Surang) Check(ctx context.Context) (bool, error) {
+func (s *Surang) Check() (bool, error) {
 	cmd := exec.Command("curl", "-4", "-s", "--socks5", fmt.Sprintf("localhost:%d", s.Port), "icanhazip.com")
 	output, err := cmd.Output()
 	if err != nil {
