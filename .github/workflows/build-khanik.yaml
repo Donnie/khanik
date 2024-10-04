@@ -52,4 +52,4 @@ jobs:
             khanik-macos-arm64
           generate_release_notes: true
           prerelease: false
-          tag_name: khanik-${{ env.APP_VERSION }}
+          tag_name: ${{ env.APP_VERSION }}

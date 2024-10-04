@@ -14,7 +14,7 @@ Khanik is a Go-based tool for managing SSH tunnels (referred to as "surangs"). I
 To download Khanik (a single executable) do:
 
 ```
-gh release download khanik-0.0.3 -R Donnie/khanik
+gh release download 0.0.2 -R Donnie/khanik
 chmod +x khanik-macos-arm64
 mv khanik-macos-arm64 /usr/local/bin/khanik
 which khanik
