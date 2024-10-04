@@ -1,9 +1,7 @@
 package vidur
 
 import (
-	"context"
 	"fmt"
-	"io/ioutil"
 	"khanik/surang"
 	"os"
 	"os/exec"
@@ -52,7 +50,7 @@ func StartDaemon() error {
 
 // StopDaemon stops the surang manager daemon.
 func StopDaemon() error {
-	pidBytes, err := ioutil.ReadFile(pidFile)
+	pidBytes, err := os.ReadFile(pidFile)
 	if err != nil {
 		return fmt.Errorf("error reading PID file: %w", err)
 	}
@@ -75,9 +73,7 @@ func ListSurangs() error {
 	mu.RLock()
 	defer mu.RUnlock()
 	for name, s := range surangs {
-		ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
-		defer cancel()
-		running := s.IsRunning(ctx)
+		running := s.IsRunning()
 		status := "Not running"
 		if running {
 			status = "Running"
@@ -137,19 +133,17 @@ func manageSurangs() error {
 		wg.Add(1)
 		go func(s *surang.Surang) {
 			defer wg.Done()
-			ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
-			defer cancel()
-			if running := s.IsRunning(ctx); !running {
-				if err := s.Start(ctx); err != nil {
+			if running := s.IsRunning(); !running {
+				if err := s.Start(); err != nil {
 					fmt.Fprintf(os.Stderr, "Failed to start surang %s: %v\n", s.Name, err)
 				} else {
 					fmt.Printf("Started surang: %s on port %d\n", s.Name, s.Port)
 				}
-			} else if ok, err := s.Check(ctx); !ok || err != nil {
+			} else if ok, err := s.Check(); !ok || err != nil {
 				if err != nil {
 					fmt.Fprintf(os.Stderr, "Error checking surang %s: %v\n", s.Name, err)
 				}
-				if err := s.Restart(ctx); err != nil {
+				if err := s.Restart(); err != nil {
 					fmt.Fprintf(os.Stderr, "Failed to restart surang %s: %v\n", s.Name, err)
 				} else {
 					fmt.Printf("Restarted surang: %s on port %d\n", s.Name, s.Port)
@@ -174,9 +168,7 @@ func destroySurangs() error {
 		wg.Add(1)
 		go func(s *surang.Surang) {
 			defer wg.Done()
-			ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
-			defer cancel()
-			if err := s.Stop(ctx); err != nil {
+			if err := s.Stop(); err != nil {
 				fmt.Fprintf(os.Stderr, "Failed to stop surang %s: %v\n", s.Name, err)
 			} else {
 				fmt.Printf("Stopped surang: %s\n", s.Name)
