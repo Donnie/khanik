@@ -1,24 +1,15 @@
 package main
 
 import (
-	"fmt"
-	"os"
+	"log"
+
+	"khanik/cmd"
 )
 
 var Version = "dev"
 
-func init() {
-	rootCmd.AddCommand(
-		startCmd,
-		stopCmd,
-		listCmd,
-		versionCmd,
-	)
-}
-
 func main() {
-	if err := rootCmd.Execute(); err != nil {
-		fmt.Println(err)
-		os.Exit(1)
+	if err := cmd.Execute(Version); err != nil {
+		log.Fatalf("Error executing command: %v", err)
 	}
 }
