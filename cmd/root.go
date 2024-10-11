@@ -19,6 +19,7 @@ func addCommands(version string) {
 	rootCmd.AddCommand(
 		newStartCmd(),
 		newStopCmd(),
+		newRestartCmd(),
 		newListCmd(),
 		newVersionCmd(version),
 	)

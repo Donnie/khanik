@@ -65,6 +65,21 @@ func StopDaemon() error {
 	return nil
 }
 
+// RestartDaemon stops and then starts the surang manager daemon.
+func RestartDaemon() error {
+	// Stop the existing daemon
+	if err := StopDaemon(); err != nil {
+		return fmt.Errorf("failed to stop daemon: %w", err)
+	}
+
+	// Start the daemon again
+	if err := StartDaemon(); err != nil {
+		return fmt.Errorf("failed to start daemon: %w", err)
+	}
+
+	return nil
+}
+
 // ListSurangs lists all configured surangs and their statuses.
 func ListSurangs() error {
 	if err := loadSurangsFromConfig(); err != nil {
