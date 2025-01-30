@@ -1,0 +1,9 @@
+surangs:
+  india:
+    command: "donnie@hapih"
+    expect_ip: "1.0.3.4"
+    port: 8080
+  germany:
+    command: "donnie@hetzner"
+    expect_ip: "2.3.93.5"
+    port: 8081
