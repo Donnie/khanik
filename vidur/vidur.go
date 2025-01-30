@@ -102,8 +102,11 @@ func runSurangManager() error {
 	if err := loadSurangsFromConfig(); err != nil {
 		return err
 	}
-	ticker := time.NewTicker(5 * time.Minute)
+
+	interval := viper.GetUint64("daemon.interval")
+	ticker := time.NewTicker(time.Duration(interval) * time.Second)
 	defer ticker.Stop()
+
 	for {
 		if err := manageSurangs(); err != nil {
 			fmt.Fprintf(os.Stderr, "Error managing surangs: %v\n", err)
@@ -115,12 +118,18 @@ func runSurangManager() error {
 func loadSurangsFromConfig() error {
 	mu.Lock()
 	defer mu.Unlock()
+
 	viper.SetConfigName("config")
 	viper.SetConfigType("yaml")
 	viper.AddConfigPath(".")
+
 	if err := viper.ReadInConfig(); err != nil {
 		return fmt.Errorf("error reading config file: %w", err)
 	}
+
+	// Set default check interval
+	viper.SetDefault("daemon.interval", 300) // Default to 5 minutes
+
 	surangsConfig := viper.GetStringMap("surangs")
 	surangs = make(map[string]*surang.Surang)
 	for name, config := range surangsConfig {
